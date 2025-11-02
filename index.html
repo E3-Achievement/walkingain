@@ -16,9 +16,9 @@
     </style>
 </head>
 <body>
-    <div id="ui-container"><div id="game-info"><div id="score">Score: 0</div><div id="lives">Lives: 3</div></div></div>
+    <div id="ui-container"><div id="game-info"><div id="score">Score: 0</div><div id="lives" data-initial-lives="3">Lives: 3</div></div></div>
     <div id="message-box"><h2 id="message-title"></h2><p id="message-text"></p><button onclick="location.reload()">Re-initialize</button></div>
-    <div id="start-prompt"><h1>// Click to Initialize</h1><p style="font-size: 16px;">(Mouse and Keyboard required)</p></div><div id="css-renderer"></div><div id="npc-dialogue"></div>
+    <div id="start-prompt"><h1>// Click to Initialize</h1><p style="font-size: 16px;">(Mouse and Keyboard required)</p><p style="font-size: 12px; margin-top: 24px; color: #7d8590;">Note: If loading fails, files must be served from a web server.</p></div><div id="css-renderer"></div><div id="npc-dialogue"></div>
     <script type="importmap">{"imports": {"three": "https://unpkg.com/three@0.157.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/"}}</script>
     <script type="module">
         import * as THREE from 'three'; 
@@ -29,281 +29,314 @@
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { Reflector } from 'three/addons/objects/Reflector.js';
         
-        const config = {"world":{"atmosphereType":"COLOR","atmosphereMediaKey":null,"bgColor":"#000000","fogColor":"#000000","fogDensity":0,"gravity":12,"effects":{"bloom":true,"bloomStrength":1.5,"bloomThreshold":0.85,"vignette":false,"vignetteDarkness":0.8,"pixelate":false,"pixelSize":8}},"player":{"speed":7,"jumpForce":9,"body":{"height":1.6,"radius":0.4},"color":"#22d3ee","appearanceType":"TEXTURED_BLOCKY","spriteKeys":{"idle":null,"walk":null,"jump":null},"textureKeys":{"headFront":"assets/asset_player_part_headFront.png","headBack":"assets/asset_player_part_headBack.png","headLeft":"assets/asset_player_part_headLeft.png","headRight":"assets/asset_player_part_headRight.png","headTop":"assets/asset_player_part_headTop.png","headBottom":"assets/asset_player_part_headBottom.webp","torso":"assets/asset_player_part_torso.png","armL":"assets/asset_player_part_armL.png","armR":"assets/asset_player_part_armR.jpg","legL":"assets/asset_player_part_legL.webp","legR":"assets/asset_player_part_legR.png"},"bodyParts":{"torso":{"w":0.8,"h":0.8,"d":0.4},"head":{"s":1.2},"limbs":{"w":0.25,"h":0.8}},"animation":{"walkSpeed":15,"swingAngle":0.8}},"rules":{"lives":3,"winScore":100,"respawnY":10},"controls":{"forward":"KeyW","backward":"KeyS","left":"KeyA","right":"KeyD","jump":"Space","cameraSpeed":20,"invertY":false,"cameraDistance":6},"objects":[{"id":0,"type":"PLATFORM","name":"Genesis Block","pos":{"x":0,"y":0,"z":0},"scale":{"x":10,"y":1,"z":10},"color":"#30363d"},{"id":1,"type":"PLATFORM","name":"PLATFORM 1","pos":{"x":6.69,"y":0.32,"z":-7.07},"scale":{"x":5,"y":0.5,"z":5},"color":"#a27258"},{"id":2,"type":"CHECKPOINT","name":"CHECKPOINT 2","pos":{"x":1.89,"y":1.69,"z":-0.75},"scale":{"x":1,"y":1,"z":1},"color":"#f59e0b"},{"id":3,"type":"HAZARD","name":"HAZARD 3","pos":{"x":-4.9,"y":0.45,"z":6.66},"scale":{"x":3,"y":0.2,"z":3},"color":"#da3633"},{"id":4,"type":"ENEMY","name":"ENEMY 4","pos":{"x":-3.28,"y":2.7,"z":-6.27},"scale":{"x":1,"y":1,"z":1},"color":"#e74c3c","patrolRange":5},{"id":5,"type":"COLLECTIBLE","name":"COLLECTIBLE 5","pos":{"x":7.11,"y":1.14,"z":-5.83},"scale":{"x":0.5,"y":0.5,"z":0.5},"color":"#f1c40f","value":10},{"id":6,"type":"MOVING_PLATFORM","name":"MOVING PLATFORM 6","pos":{"x":3.9762894518020397,"y":6.60540110352467,"z":8.065812052406905},"scale":{"x":4,"y":0.5,"z":2},"color":"#22d3ee","patrolRange":5,"speed":5,"axis":"x"},{"id":7,"type":"JUMP_PAD","name":"JUMP PAD 7","pos":{"x":10.47,"y":0.36,"z":-7.6},"scale":{"x":2,"y":0.3,"z":2},"color":"#d946ef","bounceForce":18},{"id":8,"type":"PHASING_PLATFORM","name":"PHASING PLATFORM 8","pos":{"x":11.32,"y":0.03,"z":-8.12},"scale":{"x":3,"y":0.4,"z":3},"color":"#7d8590","onTime":2,"offTime":2,"phase":0},{"id":9,"type":"NPC_PLATFORM","name":"NPC PLATFORM 9","pos":{"x":16.34,"y":0.18,"z":-6.87},"scale":{"x":4,"y":0.5,"z":4},"color":"#d946ef","npcText":"Hello, traveler!","mediaKey":"media_9_1762112746450_does-the-moon-really-exist.mp3","mediaContent":"assets/asset_obj_9_npc_platform.mp3"},{"id":10,"type":"HYPERLINK_PLATFORM","name":"HYPERLINK PLATFORM 10","pos":{"x":108.88,"y":-6.29,"z":34.25},"scale":{"x":3,"y":0.5,"z":3},"color":"#06b6d4","hyperlinkUrl":"https://www.reddit.com/r/Zeronodeisbothanopen/"},{"id":11,"type":"MIRROR_PLATFORM","name":"MIRROR PLATFORM 11","pos":{"x":94.54,"y":-4.29,"z":29.86},"scale":{"x":20,"y":0.2,"z":20},"color":"#cccccc"},{"id":12,"type":"MEDIA_IMAGE","name":"MEDIA IMAGE 12","pos":{"x":-1.7,"y":2.53,"z":2.91},"size":4,"mediaKey":"media_12_1762112852470_remi.webp","collidable":true,"mediaContent":"assets/asset_obj_12_media_image.webp"},{"id":14,"type":"MEDIA_AUDIO","name":"MEDIA AUDIO 14","pos":{"x":-7.195981359305885,"y":9.608772674914027,"z":4.587420021680817},"volume":0.8,"refDistance":5,"loop":true,"mediaKey":"media_14_1762112924738_studio-piano-1760724401423.wav","mediaContent":"assets/asset_obj_14_media_audio.wav"},{"id":15,"type":"IMAGE_PLATFORM","name":"IMAGE PLATFORM 15","pos":{"x":33.74,"y":4.39,"z":-4.29},"scale":{"x":5,"y":0.5,"z":5},"mediaKey":"media_15_1762112936114_Sequin Notebook.jpg","mediaContent":"assets/asset_obj_15_image_platform.jpg"},{"id":16,"type":"VIDEO_PLATFORM","name":"VIDEO PLATFORM 16","pos":{"x":23.3,"y":3.9,"z":-13.69},"scale":{"x":6.4,"y":3.6,"z":0.5},"mediaKey":"media_16_1762112961552_Star_Animations_for_Dance_Video.mp4","mediaContent":"assets/asset_obj_16_video_platform.mp4"},{"id":17,"type":"PLATFORM","name":"PLATFORM 17","pos":{"x":29.34,"y":3.17,"z":-2.69},"scale":{"x":5,"y":0.5,"z":5},"color":"#83b241"},{"id":18,"type":"PLATFORM","name":"PLATFORM 18","pos":{"x":102.9,"y":-3.57,"z":31.71},"scale":{"x":5,"y":0.5,"z":5},"color":"#38f2bf"},{"id":19,"type":"PLATFORM","name":"PLATFORM 19","pos":{"x":38.31,"y":6.57,"z":6.05},"scale":{"x":5,"y":0.5,"z":5},"color":"#aa350d"},{"id":20,"type":"PLATFORM","name":"PLATFORM 20","pos":{"x":6.867248660626977,"y":2.2036061112354286,"z":2.20891547517303},"scale":{"x":5,"y":0.5,"z":5},"color":"#ac6540"},{"id":21,"type":"PLATFORM","name":"PLATFORM 21","pos":{"x":31.92,"y":6.91,"z":19.22},"scale":{"x":5,"y":0.5,"z":5},"color":"#2ac335"},{"id":22,"type":"PLATFORM","name":"PLATFORM 22","pos":{"x":39.83,"y":4.95,"z":1.49},"scale":{"x":5,"y":0.5,"z":5},"color":"#49892a"},{"id":23,"type":"PLATFORM","name":"PLATFORM 23","pos":{"x":22.72,"y":-0.53,"z":0.5},"scale":{"x":5,"y":0.5,"z":5},"color":"#73a967"},{"id":24,"type":"PLATFORM","name":"PLATFORM 24","pos":{"x":37.25,"y":7.01,"z":14.37},"scale":{"x":5,"y":0.5,"z":5},"color":"#2993fb"},{"id":25,"type":"PLATFORM","name":"PLATFORM 25","pos":{"x":44.2,"y":6.83,"z":13.08},"scale":{"x":5,"y":0.5,"z":5},"color":"#36cd57"},{"id":26,"type":"PLATFORM","name":"PLATFORM 26","pos":{"x":28.32,"y":4.09,"z":2.9},"scale":{"x":5,"y":0.5,"z":5},"color":"#112a58"},{"id":27,"type":"PLATFORM","name":"PLATFORM 27","pos":{"x":24.13,"y":2.25,"z":-3.45},"scale":{"x":5,"y":0.5,"z":5},"color":"#ffa6b2"},{"id":28,"type":"PLATFORM","name":"PLATFORM 28","pos":{"x":51.65,"y":6.89,"z":27.41},"scale":{"x":40,"y":0.5,"z":10},"color":"#de13b6"},{"id":29,"type":"VIDEO_PLATFORM","name":"VIDEO PLATFORM 29","pos":{"x":73.61,"y":11.83,"z":17.24},"scale":{"x":10,"y":10,"z":50},"mediaKey":"media_29_1762114793090_Space_Video_Generation_Request.mp4","mediaContent":"assets/asset_obj_29_video_platform.mp4"},{"id":30,"type":"VIDEO_PLATFORM","name":"VIDEO PLATFORM 30","pos":{"x":58.86,"y":11.49,"z":37},"scale":{"x":10,"y":10,"z":50},"mediaKey":"media_30_1762114786218_Space_Video_Generation_Request.mp4","mediaContent":"assets/asset_obj_30_video_platform.mp4"},{"id":31,"type":"PLATFORM","name":"PLATFORM 31","pos":{"x":54.88,"y":17.15,"z":23.79},"scale":{"x":50,"y":0.5,"z":30},"color":"#448f1c"}],"meta":{"title":"My Digital World"}}; let scene, camera, renderer, cssRenderer, player, playerVisual, playerPhysicsBody, clock, listener, composer; let controls = { forward: false, backward: false, left: false, right: false, jump: false }; let playerVelocity = new THREE.Vector3(); let onGround = false; let audiosToPlay = [], videosToPlay = []; let cameraYaw, cameraPitch; let cameraOffset = new THREE.Vector3(0, 2, config.controls.cameraDistance); let gameState = { score: 0, lives: config.rules.lives, gameOver: false, gameWon: false, lastPlatformId: -1, playerState: 'idle' }; const staticPlatforms = [], movingPlatforms = [], jumpPads = [], phasingPlatforms = [], checkpoints = [], enemies = [], collectibles = [], hazards = [], mediaObjects = []; let playerPhysicsBox, enemyBoxes = [], collectibleBoxes = [], hazardBoxes = []; let dialogueTimeout; let atmosphereVideo; let currentRespawnPoint = new THREE.Vector3(0, config.rules.respawnY, 0); const ACTIVE_CHECKPOINT_COLOR = new THREE.Color(0x238636);
-        function init() {
-            scene = new THREE.Scene(); 
-            let rendererConfig = { antialias: true, stencil: true };
-
-            switch(config.world.atmosphereType) {
-                case 'IMAGE': if (config.world.atmosphereMediaContent) { const texture = new THREE.TextureLoader().load(config.world.atmosphereMediaContent, () => { texture.mapping = THREE.EquirectangularReflectionMapping; texture.colorSpace = THREE.SRGBColorSpace; scene.background = texture; }); } else { scene.background = new THREE.Color(config.world.bgColor); } break;
-                case 'VIDEO': if (config.world.atmosphereMediaContent) { atmosphereVideo = document.createElement('video'); atmosphereVideo.id = 'bg-video'; atmosphereVideo.src = config.world.atmosphereMediaContent; atmosphereVideo.loop = true; atmosphereVideo.muted = true; atmosphereVideo.playsInline = true; document.body.prepend(atmosphereVideo); rendererConfig.alpha = true; } else { scene.background = new THREE.Color(config.world.bgColor); } break;
-                default: scene.background = new THREE.Color(config.world.bgColor); scene.fog = new THREE.Fog(config.world.fogColor, 1, 1 / (config.world.fogDensity || 0.001)); break;
-            }
-
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); cameraYaw = new THREE.Object3D(); cameraPitch = new THREE.Object3D(); cameraYaw.add(cameraPitch); cameraPitch.add(camera); scene.add(cameraYaw); camera.position.copy(cameraOffset); renderer = new THREE.WebGLRenderer(rendererConfig); if(rendererConfig.alpha) renderer.setClearColor(0x000000, 0); renderer.setSize(window.innerWidth, window.innerHeight); document.body.appendChild(renderer.domElement); cssRenderer = new CSS3DRenderer(); cssRenderer.setSize(window.innerWidth, window.innerHeight); document.getElementById('css-renderer').appendChild(cssRenderer.domElement); clock = new THREE.Clock(); listener = new THREE.AudioListener(); camera.add(listener); const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); scene.add(ambientLight); const dirLight = new THREE.DirectionalLight(0xffffff, 0.8); dirLight.position.set(5, 10, 7); scene.add(dirLight); 
-            
-            player = new THREE.Object3D();
-            player.position.copy(currentRespawnPoint);
-            scene.add(player);
-            const playerPhysicsGeo = new THREE.CapsuleGeometry(config.player.body.radius, config.player.body.height - (config.player.body.radius * 2), 4, 16);
-            playerPhysicsBody = new THREE.Mesh(playerPhysicsGeo, new THREE.MeshBasicMaterial({ visible: false }));
-            player.add(playerPhysicsBody);
-
-            const appearance = config.player.appearanceType;
-            const loader = new THREE.TextureLoader();
-            if (appearance === 'ANIMATED_SPRITE') {
-                player.userData.textures = {};
-                const idleTexUrl = config.player.spriteKeys.idle;
-                const walkTexUrl = config.player.spriteKeys.walk || idleTexUrl;
-                const jumpTexUrl = config.player.spriteKeys.jump || walkTexUrl;
-
-                const spriteMat = new THREE.SpriteMaterial({ map: null, transparent: true });
-                playerVisual = new THREE.Sprite(spriteMat);
-                const h = config.player.body.height;
-                playerVisual.scale.set(h, h, 1); // Default scale, corrected on texture load
-
-                if (idleTexUrl) {
-                    loader.load(idleTexUrl, (texture) => {
-                        player.userData.textures.idle = texture;
-                        if (!playerVisual.material.map) { // Set only if no texture is set yet
-                            playerVisual.material.map = texture;
-                            const aspect = texture.image ? (texture.image.width / texture.image.height) : 1;
-                            playerVisual.scale.set(h * aspect, h, 1);
-                        }
-                    });
-                }
-                if (walkTexUrl) player.userData.textures.walk = loader.load(walkTexUrl);
-                if (jumpTexUrl) player.userData.textures.jump = loader.load(jumpTexUrl);
-            } else { // COLOR or TEXTURED_BLOCKY
-                playerVisual = new THREE.Group();
-                playerVisual.userData.parts = {};
-                const p = config.player;
-                const isTextured = appearance === 'TEXTURED_BLOCKY';
-
-                const createMaterial = (partName) => {
-                    const key = isTextured ? p.textureKeys[partName] : null;
-                    const mat = new THREE.MeshStandardMaterial({ color: isTextured ? 0xffffff : p.color });
-                    if(key) mat.map = loader.load(key);
-                    return mat;
-                };
-                
-                const faceKeys = ['headRight', 'headLeft', 'headTop', 'headBottom', 'headFront', 'headBack'];
-                const headMats = faceKeys.map(key => createMaterial(key));
-                
-                const torso = new THREE.Mesh(new THREE.BoxGeometry(p.bodyParts.torso.w, p.bodyParts.torso.h, p.bodyParts.torso.d), createMaterial('torso'));
-                const head = new THREE.Mesh(new THREE.BoxGeometry(p.bodyParts.head.s,p.bodyParts.head.s,p.bodyParts.head.s), headMats);
-                head.position.y = p.bodyParts.torso.h / 2 + p.bodyParts.head.s / 2;
-                
-                const limbGeo = new THREE.BoxGeometry(p.bodyParts.limbs.w, p.bodyParts.limbs.h, p.bodyParts.limbs.w);
-                const armL = new THREE.Mesh(limbGeo, createMaterial('armL'));
-                armL.position.set(-(p.bodyParts.torso.w/2 + p.bodyParts.limbs.w/2), 0, 0);
-                const armR = new THREE.Mesh(limbGeo, createMaterial('armR'));
-                armR.position.x = (p.bodyParts.torso.w/2 + p.bodyParts.limbs.w/2);
-                const legL = new THREE.Mesh(limbGeo, createMaterial('legL'));
-                legL.position.set(-(p.bodyParts.torso.w/4), -(p.bodyParts.torso.h/2), 0);
-                const legR = new THREE.Mesh(limbGeo, createMaterial('legR'));
-                legR.position.set((p.bodyParts.torso.w/4), -(p.bodyParts.torso.h/2), 0);
-
-                playerVisual.add(torso, head, armL, armR, legL, legR);
-                playerVisual.userData.parts = { torso, head, armL, armR, legL, legR };
-            }
-            player.add(playerVisual);
-            playerPhysicsBox = new THREE.Box3();
-
-            composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scene, camera));
-            if(config.world.effects.bloom) { composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), config.world.effects.bloomStrength, 0.4, config.world.effects.bloomThreshold)); }
-            if(config.world.effects.vignette) { composer.addPass(new ShaderPass({ uniforms: { tDiffuse: { value: null }, darkness: { value: config.world.effects.vignetteDarkness } }, vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`, fragmentShader: `uniform sampler2D tDiffuse; uniform float darkness; varying vec2 vUv; void main() { vec2 uv = vUv; float d = distance(uv, vec2(0.5)); vec4 color = texture2D(tDiffuse, uv); gl_FragColor = vec4(color.rgb * (1.0 - d * darkness), color.a);}` })); }
-            if(config.world.effects.pixelate) { composer.addPass(new ShaderPass({ uniforms: { tDiffuse: { value: null }, resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }, pixelSize: { value: config.world.effects.pixelSize } }, vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );}`, fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 resolution; uniform float pixelSize; varying vec2 vUv; void main() { vec2 uv = floor( vUv * resolution / pixelSize) * pixelSize / resolution; gl_FragColor = texture2D(tDiffuse, uv); }`})); }
-
-            config.objects.forEach(obj => { let mesh, box; const pos = new THREE.Vector3(obj.pos.x, obj.pos.y, obj.pos.z);
-                switch (obj.type) {
-                    case 'PLATFORM': case 'NPC_PLATFORM': case 'HYPERLINK_PLATFORM': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); staticPlatforms.push({mesh, box, config: obj}); break;
-                    case 'MOVING_PLATFORM': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); movingPlatforms.push({mesh, box, config: obj, lastPos: pos.clone()}); break;
-                    case 'JUMP_PAD': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshStandardMaterial({ color: obj.color, emissive: obj.color, emissiveIntensity: 0.5 })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); jumpPads.push({mesh, box, config: obj}); break;
-                    case 'PHASING_PLATFORM': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color, transparent: true })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); phasingPlatforms.push({mesh, box, config: obj}); break;
-                    case 'CHECKPOINT': mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 2.5, 8), new THREE.MeshStandardMaterial({ color: obj.color, emissive: obj.color, emissiveIntensity: 0.5 })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); checkpoints.push({mesh, box, config: obj, activated: false}); break;
-                    case 'MIRROR_PLATFORM': {
-                        const group = new THREE.Group(); group.position.copy(pos);
-                        const frame = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color }));
-                        const reflector = new Reflector(new THREE.PlaneGeometry(obj.scale.x, obj.scale.z), {
-                            clipBias: 0.003, textureWidth: window.innerWidth * window.devicePixelRatio, textureHeight: window.innerHeight * window.devicePixelRatio, color: 0x889999
-                        });
-                        reflector.position.y = obj.scale.y / 2 + 0.01;
-                        reflector.rotation.x = -Math.PI / 2;
-                        group.add(frame, reflector);
-                        mesh = group;
-                        box = new THREE.Box3();
-                        box.setFromObject(frame, true); // Use the frame for collision
-                        staticPlatforms.push({mesh: group, box, config: obj}); 
-                        break;
-                    }
-                    case 'IMAGE_PLATFORM': if(!obj.mediaContent) break; const tex = new THREE.TextureLoader().load(obj.mediaContent); mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ map: tex })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); staticPlatforms.push({mesh, box, config: obj}); break;
-                    case 'VIDEO_PLATFORM': if(!obj.mediaContent) break; const video = document.createElement('video'); video.src = obj.mediaContent; video.loop = true; video.muted = true; video.playsInline = true; video.crossOrigin = 'anonymous'; const vidTex = new THREE.VideoTexture(video); mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshBasicMaterial({ map: vidTex })); videosToPlay.push(video); mesh.position.copy(pos); mesh.rotation.y = Math.PI / 2; box = new THREE.Box3().setFromObject(mesh); staticPlatforms.push({mesh, box, config: obj}); break;
-                    case 'ENEMY': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color })); mesh.position.copy(pos); obj.direction = 1; obj.originX = obj.pos.x; enemies.push(mesh); box = new THREE.Box3().setFromObject(mesh); enemyBoxes.push(box); break;
-                    case 'COLLECTIBLE': mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.5, 0), new THREE.MeshStandardMaterial({ color: obj.color, emissive: obj.color })); mesh.position.copy(pos); collectibles.push(mesh); box = new THREE.Box3().setFromObject(mesh); collectibleBoxes.push(box); break;
-                    case 'HAZARD': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); hazardBoxes.push(box); break;
-                    case 'MEDIA_IMAGE': if(!obj.mediaContent) break; const map = new THREE.TextureLoader().load(obj.mediaContent); mesh = new THREE.Sprite(new THREE.SpriteMaterial({ map: map, transparent: true })); mesh.scale.set(obj.size, obj.size, 1); mediaObjects.push(mesh); if (obj.collidable) { const center = new THREE.Vector3(obj.pos.x, obj.pos.y, obj.pos.z); const halfSize = new THREE.Vector3(obj.size / 2, obj.size / 2, 0.1); box = new THREE.Box3().setFromCenterAndSize(center, halfSize.multiplyScalar(2)); staticPlatforms.push({ mesh, box, config: obj }); } break;
-                    case 'MEDIA_YOUTUBE': const videoIdMatch = obj.youtubeUrl.match(/(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/); const videoId = (videoIdMatch && videoIdMatch[1].length === 11) ? videoIdMatch[1] : null; if (videoId) { const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&mute=1`; const div = document.createElement('div'); div.className = 'css-object'; div.style.width = '640px'; div.style.height = '360px'; div.innerHTML = `<iframe src="${embedUrl}" style="width:100%;height:100%;border:0;" allow="autoplay; encrypted-media"></iframe>`; mesh = new CSS3DObject(div); const aspectRatio = 360 / 640; mesh.scale.set(0.01 * obj.size, 0.01 * obj.size * aspectRatio, 1); if (obj.collidable) { const center = new THREE.Vector3(obj.pos.x, obj.pos.y, obj.pos.z); const halfSize = new THREE.Vector3(obj.size / 2, (obj.size * aspectRatio) / 2, 0.1); box = new THREE.Box3().setFromCenterAndSize(center, halfSize.multiplyScalar(2)); staticPlatforms.push({ mesh, box, config: obj }); } } break;
-                    case 'MEDIA_AUDIO': if(!obj.mediaContent) break; const audioHolder = new THREE.Object3D(); const pAudio = new THREE.PositionalAudio(listener); new THREE.AudioLoader().load(obj.mediaContent, (buffer) => { pAudio.setBuffer(buffer); pAudio.setRefDistance(obj.refDistance); pAudio.setLoop(obj.loop); pAudio.setVolume(obj.volume); audiosToPlay.push(pAudio); }); audioHolder.add(pAudio); mesh = audioHolder; break;
-                } if (mesh) { if(obj.type !== 'MIRROR_PLATFORM') mesh.position.copy(pos); mesh.userData = obj; scene.add(mesh); }
-            });
-            window.addEventListener('resize', onWindowResize); document.addEventListener('keydown', onKey); document.addEventListener('keyup', onKey); document.addEventListener('pointermove', onPointerMove); document.addEventListener('wheel', onMouseWheel); document.getElementById('start-prompt').addEventListener('click', startGame, { once: true });
-        }
-        function startGame() { document.getElementById('start-prompt').style.display = 'none'; document.body.requestPointerLock().catch(e => console.warn("Could not lock pointer:", e)); if (listener.context.state === 'suspended') listener.context.resume(); audiosToPlay.forEach(audio => audio.play()); videosToPlay.forEach(video => video.play().catch(e=>console.error("Video play failed:", e))); if(atmosphereVideo) atmosphereVideo.play().catch(e => console.error("Video play failed:", e)); animate(); }
-        function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); cssRenderer.setSize(window.innerWidth, window.innerHeight); composer.setSize(window.innerWidth, window.innerHeight); }
-        function onPointerMove(event) { if (document.pointerLockElement !== document.body) return; const camSpeed = config.controls.cameraSpeed * 0.0002; const invert = config.controls.invertY ? 1 : -1; cameraYaw.rotation.y -= event.movementX * camSpeed; cameraPitch.rotation.x += event.movementY * camSpeed * invert; cameraPitch.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, cameraPitch.rotation.x)); }
-        function onMouseWheel(event) { cameraOffset.z += event.deltaY * 0.01; cameraOffset.z = Math.max(3, Math.min(20, cameraOffset.z)); }
-        function onKey(event) { const state = event.type === 'keydown'; const ctrl = config.controls; if (event.code === ctrl.forward) controls.forward = state; else if (event.code === ctrl.backward) controls.backward = state; else if (event.code === ctrl.left) controls.left = state; else if (event.code === ctrl.right) controls.right = state; else if (event.code === ctrl.jump) controls.jump = state; }
-        function handlePlatformLanded(platform) { if (gameState.lastPlatformId === platform.config.id) return; gameState.lastPlatformId = platform.config.id; if (platform.config.type === 'NPC_PLATFORM') { const dialogueEl = document.getElementById('npc-dialogue'); dialogueEl.textContent = platform.config.npcText; dialogueEl.classList.add('show'); clearTimeout(dialogueTimeout); dialogueTimeout = setTimeout(() => dialogueEl.classList.remove('show'), 5000); if (platform.config.mediaContent) { const audio = new THREE.Audio(listener); new THREE.AudioLoader().load(platform.config.mediaContent, (buffer) => { audio.setBuffer(buffer); audio.play(); }); } } else if (platform.config.type === 'HYPERLINK_PLATFORM' && platform.config.hyperlinkUrl) { try { new URL(platform.config.hyperlinkUrl); showMessage('Redirecting...', `Opening: ${platform.config.hyperlinkUrl}`, false); setTimeout(() => { if(document.pointerLockElement) document.exitPointerLock(); window.open(platform.config.hyperlinkUrl, '_blank'); }, 2000); } catch(e) { console.error("Invalid URL:", platform.config.hyperlinkUrl); } } }
         
-        function updatePlayer(delta, elapsedTime) {
-            const speed = config.player.speed;
-            const wasOnGround = onGround;
-            onGround = false;
+            function runGame(config) {
+                let scene, camera, renderer, cssRenderer, player, playerVisual, playerPhysicsBody, clock, listener, composer;
+                let controls = { forward: false, backward: false, left: false, right: false, jump: false };
+                let playerVelocity = new THREE.Vector3();
+                let onGround = false;
+                let audiosToPlay = [], videosToPlay = [];
+                let cameraYaw, cameraPitch;
+                let cameraOffset = new THREE.Vector3(0, 2, config.controls.cameraDistance);
+                let gameState = { score: 0, lives: config.rules.lives, gameOver: false, gameWon: false, lastPlatformId: -1, playerState: 'idle' };
+                const staticPlatforms = [], movingPlatforms = [], jumpPads = [], phasingPlatforms = [], checkpoints = [], enemies = [], collectibles = [], hazards = [], mediaObjects = [];
+                let playerPhysicsBox, enemyBoxes = [], collectibleBoxes = [], hazardBoxes = [];
+                let dialogueTimeout;
+                let atmosphereVideo;
+                let currentRespawnPoint = new THREE.Vector3(0, config.rules.respawnY, 0);
+                const ACTIVE_CHECKPOINT_COLOR = new THREE.Color(0x238636);
 
-            playerVelocity.y -= config.world.gravity * delta;
-            const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(cameraYaw.quaternion).setY(0).normalize();
-            const right = new THREE.Vector3(1, 0, 0).applyQuaternion(cameraYaw.quaternion).setY(0).normalize();
-            const moveDirection = new THREE.Vector3();
-            if (controls.forward) moveDirection.add(forward);
-            if (controls.backward) moveDirection.sub(forward);
-            if (controls.left) moveDirection.sub(right);
-            if (controls.right) moveDirection.add(right);
-            moveDirection.normalize();
-            
-            playerVelocity.x = moveDirection.x * speed;
-            playerVelocity.z = moveDirection.z * speed;
-            
-            if (controls.jump && wasOnGround) { playerVelocity.y = config.player.jumpForce; }
-            controls.jump = false;
-            
-            const allPlatforms = [...staticPlatforms, ...movingPlatforms, ...jumpPads, ...phasingPlatforms.filter(p => p.mesh.visible)];
-            const collisionSteps = 5;
-            const stepDelta = delta / collisionSteps;
+                function init() {
+                    document.getElementById('lives').innerText = 'Lives: ' + config.rules.lives;
+                    scene = new THREE.Scene(); 
+                    let rendererConfig = { antialias: true, stencil: true };
 
-            for (let i = 0; i < collisionSteps; i++) {
-                const stepMovement = playerVelocity.clone().multiplyScalar(stepDelta);
-                player.position.add(stepMovement);
-                player.updateWorldMatrix(true, false);
-                playerPhysicsBox.setFromObject(playerPhysicsBody);
+                    switch(config.world.atmosphereType) {
+                        case 'IMAGE': if (config.world.atmosphereMediaContent) { const texture = new THREE.TextureLoader().load(config.world.atmosphereMediaContent, () => { texture.mapping = THREE.EquirectangularReflectionMapping; texture.colorSpace = THREE.SRGBColorSpace; scene.background = texture; }); } else { scene.background = new THREE.Color(config.world.bgColor); } break;
+                        case 'VIDEO': if (config.world.atmosphereMediaContent) { atmosphereVideo = document.createElement('video'); atmosphereVideo.id = 'bg-video'; atmosphereVideo.src = config.world.atmosphereMediaContent; atmosphereVideo.loop = true; atmosphereVideo.muted = true; atmosphereVideo.playsInline = true; document.body.prepend(atmosphereVideo); rendererConfig.alpha = true; } else { scene.background = new THREE.Color(config.world.bgColor); } break;
+                        default: scene.background = new THREE.Color(config.world.bgColor); scene.fog = new THREE.Fog(config.world.fogColor, 1, 1 / (config.world.fogDensity || 0.001)); break;
+                    }
 
-                let groundCollisionThisStep = false;
-                
-                allPlatforms.forEach(p => {
-                    if (p.config.type === 'MIRROR_PLATFORM') { p.box.setFromObject(p.mesh.children[0], true); } 
-                    else if (p.mesh.isMesh) { p.box.setFromObject(p.mesh); }
-                });
+                    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); cameraYaw = new THREE.Object3D(); cameraPitch = new THREE.Object3D(); cameraYaw.add(cameraPitch); cameraPitch.add(camera); scene.add(cameraYaw); camera.position.copy(cameraOffset); renderer = new THREE.WebGLRenderer(rendererConfig); if(rendererConfig.alpha) renderer.setClearColor(0x000000, 0); renderer.setSize(window.innerWidth, window.innerHeight); document.body.appendChild(renderer.domElement); cssRenderer = new CSS3DRenderer(); cssRenderer.setSize(window.innerWidth, window.innerHeight); document.getElementById('css-renderer').appendChild(cssRenderer.domElement); clock = new THREE.Clock(); listener = new THREE.AudioListener(); camera.add(listener); const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); scene.add(ambientLight); const dirLight = new THREE.DirectionalLight(0xffffff, 0.8); dirLight.position.set(5, 10, 7); scene.add(dirLight); 
+                    
+                    player = new THREE.Object3D();
+                    player.position.copy(currentRespawnPoint);
+                    scene.add(player);
+                    const playerPhysicsGeo = new THREE.CapsuleGeometry(config.player.body.radius, config.player.body.height - (config.player.body.radius * 2), 4, 16);
+                    playerPhysicsBody = new THREE.Mesh(playerPhysicsGeo, new THREE.MeshBasicMaterial({ visible: false }));
+                    player.add(playerPhysicsBody);
 
-                for (const platform of allPlatforms) {
-                    if (playerPhysicsBox.intersectsBox(platform.box)) {
-                        const intersection = new THREE.Box3().copy(playerPhysicsBox).intersect(platform.box);
-                        const penetration = new THREE.Vector3(
-                            intersection.max.x - intersection.min.x,
-                            intersection.max.y - intersection.min.y,
-                            intersection.max.z - intersection.min.z
-                        );
-                        
-                        const playerCenter = playerPhysicsBox.getCenter(new THREE.Vector3());
-                        const platformCenter = platform.box.getCenter(new THREE.Vector3());
+                    const appearance = config.player.appearanceType;
+                    const loader = new THREE.TextureLoader();
+                    if (appearance === 'ANIMATED_SPRITE') {
+                        player.userData.textures = {};
+                        const idleTexUrl = config.player.spriteKeys.idle;
+                        const walkTexUrl = config.player.spriteKeys.walk || idleTexUrl;
+                        const jumpTexUrl = config.player.spriteKeys.jump || walkTexUrl;
 
-                        if (penetration.y < penetration.x && penetration.y < penetration.z) { // Vertical collision
-                            if (playerCenter.y > platformCenter.y) { // Landed on top
-                                player.position.y += penetration.y;
-                                playerVelocity.y = 0;
-                                onGround = true;
-                                groundCollisionThisStep = true;
-                                if (gameState.lastPlatformId !== platform.config.id) {
-                                    if (platform.config.type === 'JUMP_PAD') { playerVelocity.y = platform.config.bounceForce; }
-                                    else { handlePlatformLanded(platform); }
+                        const spriteMat = new THREE.SpriteMaterial({ map: null, transparent: true });
+                        playerVisual = new THREE.Sprite(spriteMat);
+                        const h = config.player.body.height;
+                        playerVisual.scale.set(h, h, 1); // Default scale, corrected on texture load
+
+                        if (idleTexUrl) {
+                            loader.load(idleTexUrl, (texture) => {
+                                player.userData.textures.idle = texture;
+                                if (!playerVisual.material.map) { // Set only if no texture is set yet
+                                    playerVisual.material.map = texture;
+                                    const aspect = texture.image ? (texture.image.width / texture.image.height) : 1;
+                                    playerVisual.scale.set(h * aspect, h, 1);
                                 }
-                                gameState.lastPlatformId = platform.config.id;
-                            } else { // Hit ceiling
-                                player.position.y -= penetration.y;
-                                if (playerVelocity.y > 0) playerVelocity.y = 0;
-                            }
-                        } else if (penetration.x < penetration.z) { // Horizontal X collision
-                            player.position.x += (playerCenter.x > platformCenter.x ? penetration.x : -penetration.x);
-                            playerVelocity.x = 0;
-                        } else { // Horizontal Z collision
-                            player.position.z += (playerCenter.z > platformCenter.z ? penetration.z : -penetration.z);
-                            playerVelocity.z = 0;
+                            });
                         }
+                        if (walkTexUrl) player.userData.textures.walk = loader.load(walkTexUrl);
+                        if (jumpTexUrl) player.userData.textures.jump = loader.load(jumpTexUrl);
+
+                    } else { // COLOR or TEXTURED_BLOCKY
+                        playerVisual = new THREE.Group();
+                        playerVisual.userData.parts = {};
+                        const p = config.player;
+                        const isTextured = appearance === 'TEXTURED_BLOCKY';
+
+                        const createMaterial = (partName) => {
+                            const key = isTextured ? p.textureKeys[partName] : null;
+                            const mat = new THREE.MeshStandardMaterial({ color: isTextured ? 0xffffff : p.color });
+                            if(key) mat.map = loader.load(key);
+                            return mat;
+                        };
                         
+                        const faceKeys = ['headRight', 'headLeft', 'headTop', 'headBottom', 'headFront', 'headBack'];
+                        const headMats = faceKeys.map(key => createMaterial(key));
+                        
+                        const torso = new THREE.Mesh(new THREE.BoxGeometry(p.bodyParts.torso.w, p.bodyParts.torso.h, p.bodyParts.torso.d), createMaterial('torso'));
+                        const head = new THREE.Mesh(new THREE.BoxGeometry(p.bodyParts.head.s,p.bodyParts.head.s,p.bodyParts.head.s), headMats);
+                        head.position.y = p.bodyParts.torso.h / 2 + p.bodyParts.head.s / 2;
+                        
+                        const limbGeo = new THREE.BoxGeometry(p.bodyParts.limbs.w, p.bodyParts.limbs.h, p.bodyParts.limbs.w);
+                        const armL = new THREE.Mesh(limbGeo, createMaterial('armL'));
+                        armL.position.set(-(p.bodyParts.torso.w/2 + p.bodyParts.limbs.w/2), 0, 0);
+                        const armR = new THREE.Mesh(limbGeo, createMaterial('armR'));
+                        armR.position.x = (p.bodyParts.torso.w/2 + p.bodyParts.limbs.w/2);
+                        const legL = new THREE.Mesh(limbGeo, createMaterial('legL'));
+                        legL.position.set(-(p.bodyParts.torso.w/4), -(p.bodyParts.torso.h/2), 0);
+                        const legR = new THREE.Mesh(limbGeo, createMaterial('legR'));
+                        legR.position.set((p.bodyParts.torso.w/4), -(p.bodyParts.torso.h/2), 0);
+
+                        playerVisual.add(torso, head, armL, armR, legL, legR);
+                        playerVisual.userData.parts = { torso, head, armL, armR, legL, legR };
+                    }
+                    player.add(playerVisual);
+                    playerPhysicsBox = new THREE.Box3();
+
+                    composer = new EffectComposer(renderer); composer.addPass(new RenderPass(scene, camera));
+                    if(config.world.effects.bloom) { composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), config.world.effects.bloomStrength, 0.4, config.world.effects.bloomThreshold)); }
+                    if(config.world.effects.vignette) { composer.addPass(new ShaderPass({ uniforms: { tDiffuse: { value: null }, darkness: { value: config.world.effects.vignetteDarkness } }, vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`, fragmentShader: `uniform sampler2D tDiffuse; uniform float darkness; varying vec2 vUv; void main() { vec2 uv = vUv; float d = distance(uv, vec2(0.5)); vec4 color = texture2D(tDiffuse, uv); gl_FragColor = vec4(color.rgb * (1.0 - d * darkness), color.a);}` })); }
+                    if(config.world.effects.pixelate) { composer.addPass(new ShaderPass({ uniforms: { tDiffuse: { value: null }, resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }, pixelSize: { value: config.world.effects.pixelSize } }, vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );}`, fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 resolution; uniform float pixelSize; varying vec2 vUv; void main() { vec2 uv = floor( vUv * resolution / pixelSize) * pixelSize / resolution; gl_FragColor = texture2D(tDiffuse, uv); }`})); }
+
+                    config.objects.forEach(obj => { let mesh, box; const pos = new THREE.Vector3(obj.pos.x, obj.pos.y, obj.pos.z);
+                        switch (obj.type) {
+                            case 'PLATFORM': case 'NPC_PLATFORM': case 'HYPERLINK_PLATFORM': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); staticPlatforms.push({mesh, box, config: obj}); break;
+                            case 'MOVING_PLATFORM': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); movingPlatforms.push({mesh, box, config: obj, lastPos: pos.clone()}); break;
+                            case 'JUMP_PAD': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshStandardMaterial({ color: obj.color, emissive: obj.color, emissiveIntensity: 0.5 })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); jumpPads.push({mesh, box, config: obj}); break;
+                            case 'PHASING_PLATFORM': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color, transparent: true })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); phasingPlatforms.push({mesh, box, config: obj}); break;
+                            case 'CHECKPOINT': mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 2.5, 8), new THREE.MeshStandardMaterial({ color: obj.color, emissive: obj.color, emissiveIntensity: 0.5 })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); checkpoints.push({mesh, box, config: obj, activated: false}); break;
+                            case 'MIRROR_PLATFORM': {
+                                const group = new THREE.Group(); group.position.copy(pos);
+                                const frame = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color }));
+                                const reflector = new Reflector(new THREE.PlaneGeometry(obj.scale.x, obj.scale.z), {
+                                    clipBias: 0.003, textureWidth: window.innerWidth * window.devicePixelRatio, textureHeight: window.innerHeight * window.devicePixelRatio, color: 0x889999
+                                });
+                                reflector.position.y = obj.scale.y / 2 + 0.01;
+                                reflector.rotation.x = -Math.PI / 2;
+                                group.add(frame, reflector);
+                                mesh = group;
+                                box = new THREE.Box3();
+                                box.setFromObject(frame, true); // Use the frame for collision
+                                staticPlatforms.push({mesh: group, box, config: obj}); 
+                                break;
+                            }
+                            case 'IMAGE_PLATFORM': if(!obj.mediaContent) break; const tex = new THREE.TextureLoader().load(obj.mediaContent); mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ map: tex })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); staticPlatforms.push({mesh, box, config: obj}); break;
+                            case 'VIDEO_PLATFORM': if(!obj.mediaContent) break; const video = document.createElement('video'); video.src = obj.mediaContent; video.loop = true; video.muted = true; video.playsInline = true; video.crossOrigin = 'anonymous'; const vidTex = new THREE.VideoTexture(video); mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshBasicMaterial({ map: vidTex })); videosToPlay.push(video); mesh.position.copy(pos); mesh.rotation.y = Math.PI / 2; box = new THREE.Box3().setFromObject(mesh); staticPlatforms.push({mesh, box, config: obj}); break;
+                            case 'ENEMY': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color })); mesh.position.copy(pos); obj.direction = 1; obj.originX = obj.pos.x; enemies.push(mesh); box = new THREE.Box3().setFromObject(mesh); enemyBoxes.push(box); break;
+                            case 'COLLECTIBLE': mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.5, 0), new THREE.MeshStandardMaterial({ color: obj.color, emissive: obj.color })); mesh.position.copy(pos); collectibles.push(mesh); box = new THREE.Box3().setFromObject(mesh); collectibleBoxes.push(box); break;
+                            case 'HAZARD': mesh = new THREE.Mesh(new THREE.BoxGeometry(obj.scale.x, obj.scale.y, obj.scale.z), new THREE.MeshLambertMaterial({ color: obj.color })); mesh.position.copy(pos); box = new THREE.Box3().setFromObject(mesh); hazardBoxes.push(box); break;
+                            case 'MEDIA_IMAGE': if(!obj.mediaContent) break; const map = new THREE.TextureLoader().load(obj.mediaContent); mesh = new THREE.Sprite(new THREE.SpriteMaterial({ map: map, transparent: true })); mesh.scale.set(obj.size, obj.size, 1); mediaObjects.push(mesh); if (obj.collidable) { const center = new THREE.Vector3(obj.pos.x, obj.pos.y, obj.pos.z); const halfSize = new THREE.Vector3(obj.size / 2, obj.size / 2, 0.1); box = new THREE.Box3().setFromCenterAndSize(center, halfSize.multiplyScalar(2)); staticPlatforms.push({ mesh, box, config: obj }); } break;
+                            case 'MEDIA_YOUTUBE': const videoIdMatch = obj.youtubeUrl.match(/(?:youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=)([^#\&\?]*).*/); const videoId = (videoIdMatch && videoIdMatch[1].length === 11) ? videoIdMatch[1] : null; if (videoId) { const embedUrl = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&mute=1`; const div = document.createElement('div'); div.className = 'css-object'; div.style.width = '640px'; div.style.height = '360px'; div.innerHTML = `<iframe src="${embedUrl}" style="width:100%;height:100%;border:0;" allow="autoplay; encrypted-media"></iframe>`; mesh = new CSS3DObject(div); const aspectRatio = 360 / 640; mesh.scale.set(0.01 * obj.size, 0.01 * obj.size * aspectRatio, 1); if (obj.collidable) { const center = new THREE.Vector3(obj.pos.x, obj.pos.y, obj.pos.z); const halfSize = new THREE.Vector3(obj.size / 2, (obj.size * aspectRatio) / 2, 0.1); box = new THREE.Box3().setFromCenterAndSize(center, halfSize.multiplyScalar(2)); staticPlatforms.push({ mesh, box, config: obj }); } } break;
+                            case 'MEDIA_AUDIO': if(!obj.mediaContent) break; const audioHolder = new THREE.Object3D(); const pAudio = new THREE.PositionalAudio(listener); new THREE.AudioLoader().load(obj.mediaContent, (buffer) => { pAudio.setBuffer(buffer); pAudio.setRefDistance(obj.refDistance); pAudio.setLoop(obj.loop); pAudio.setVolume(obj.volume); audiosToPlay.push(pAudio); }); audioHolder.add(pAudio); mesh = audioHolder; break;
+                        } if (mesh) { if(obj.type !== 'MIRROR_PLATFORM') mesh.position.copy(pos); mesh.userData = obj; scene.add(mesh); }
+                    });
+                    window.addEventListener('resize', onWindowResize); document.addEventListener('keydown', onKey); document.addEventListener('keyup', onKey); document.addEventListener('pointermove', onPointerMove); document.addEventListener('wheel', onMouseWheel); document.getElementById('start-prompt').addEventListener('click', startGame, { once: true });
+                }
+                function startGame() { document.getElementById('start-prompt').style.display = 'none'; document.body.requestPointerLock().catch(e => console.warn("Could not lock pointer:", e)); if (listener.context.state === 'suspended') listener.context.resume(); audiosToPlay.forEach(audio => audio.play()); videosToPlay.forEach(video => video.play().catch(e=>console.error("Video play failed:", e))); if(atmosphereVideo) atmosphereVideo.play().catch(e => console.error("Video play failed:", e)); animate(); }
+                function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); cssRenderer.setSize(window.innerWidth, window.innerHeight); composer.setSize(window.innerWidth, window.innerHeight); }
+                function onPointerMove(event) { if (document.pointerLockElement !== document.body) return; const camSpeed = config.controls.cameraSpeed * 0.0002; const invert = config.controls.invertY ? 1 : -1; cameraYaw.rotation.y -= event.movementX * camSpeed; cameraPitch.rotation.x += event.movementY * camSpeed * invert; cameraPitch.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, cameraPitch.rotation.x)); }
+                function onMouseWheel(event) { cameraOffset.z += event.deltaY * 0.01; cameraOffset.z = Math.max(3, Math.min(20, cameraOffset.z)); }
+                function onKey(event) { const state = event.type === 'keydown'; const ctrl = config.controls; if (event.code === ctrl.forward) controls.forward = state; else if (event.code === ctrl.backward) controls.backward = state; else if (event.code === ctrl.left) controls.left = state; else if (event.code === ctrl.right) controls.right = state; else if (event.code === ctrl.jump) controls.jump = state; }
+                function handlePlatformLanded(platform) { if (gameState.lastPlatformId === platform.config.id) return; gameState.lastPlatformId = platform.config.id; if (platform.config.type === 'NPC_PLATFORM') { const dialogueEl = document.getElementById('npc-dialogue'); dialogueEl.textContent = platform.config.npcText; dialogueEl.classList.add('show'); clearTimeout(dialogueTimeout); dialogueTimeout = setTimeout(() => dialogueEl.classList.remove('show'), 5000); if (platform.config.mediaContent) { const audio = new THREE.Audio(listener); new THREE.AudioLoader().load(platform.config.mediaContent, (buffer) => { audio.setBuffer(buffer); audio.play(); }); } } else if (platform.config.type === 'HYPERLINK_PLATFORM' && platform.config.hyperlinkUrl) { try { new URL(platform.config.hyperlinkUrl); showMessage('Redirecting...', `Opening: ${platform.config.hyperlinkUrl}`, false); setTimeout(() => { if(document.pointerLockElement) document.exitPointerLock(); window.open(platform.config.hyperlinkUrl, '_blank'); }, 2000); } catch(e) { console.error("Invalid URL:", platform.config.hyperlinkUrl); } } }
+                function updatePlayer(delta, elapsedTime) {
+                    const speed = config.player.speed;
+                    const wasOnGround = onGround;
+                    onGround = false;
+
+                    playerVelocity.y -= config.world.gravity * delta;
+                    const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(cameraYaw.quaternion).setY(0).normalize();
+                    const right = new THREE.Vector3(1, 0, 0).applyQuaternion(cameraYaw.quaternion).setY(0).normalize();
+                    const moveDirection = new THREE.Vector3();
+                    if (controls.forward) moveDirection.add(forward);
+                    if (controls.backward) moveDirection.sub(forward);
+                    if (controls.left) moveDirection.sub(right);
+                    if (controls.right) moveDirection.add(right);
+                    moveDirection.normalize();
+                    
+                    playerVelocity.x = moveDirection.x * speed;
+                    playerVelocity.z = moveDirection.z * speed;
+                    
+                    if (controls.jump && wasOnGround) { playerVelocity.y = config.player.jumpForce; }
+                    controls.jump = false;
+                    
+                    const allPlatforms = [...staticPlatforms, ...movingPlatforms, ...jumpPads, ...phasingPlatforms.filter(p => p.mesh.visible)];
+                    const collisionSteps = 5;
+                    const stepDelta = delta / collisionSteps;
+
+                    for (let i = 0; i < collisionSteps; i++) {
+                        const stepMovement = playerVelocity.clone().multiplyScalar(stepDelta);
+                        player.position.add(stepMovement);
                         player.updateWorldMatrix(true, false);
                         playerPhysicsBox.setFromObject(playerPhysicsBody);
+
+                        let groundCollisionThisStep = false;
+                        
+                        allPlatforms.forEach(p => {
+                            if (p.config.type === 'MIRROR_PLATFORM') { p.box.setFromObject(p.mesh.children[0], true); } 
+                            else if (p.mesh.isMesh) { p.box.setFromObject(p.mesh); }
+                        });
+
+                        for (const platform of allPlatforms) {
+                            if (playerPhysicsBox.intersectsBox(platform.box)) {
+                                const intersection = new THREE.Box3().copy(playerPhysicsBox).intersect(platform.box);
+                                const penetration = new THREE.Vector3(
+                                    intersection.max.x - intersection.min.x,
+                                    intersection.max.y - intersection.min.y,
+                                    intersection.max.z - intersection.min.z
+                                );
+                                
+                                const playerCenter = playerPhysicsBox.getCenter(new THREE.Vector3());
+                                const platformCenter = platform.box.getCenter(new THREE.Vector3());
+
+                                if (penetration.y < penetration.x && penetration.y < penetration.z) { // Vertical collision
+                                    if (playerCenter.y > platformCenter.y) { // Landed on top
+                                        player.position.y += penetration.y;
+                                        playerVelocity.y = 0;
+                                        onGround = true;
+                                        groundCollisionThisStep = true;
+                                        if (gameState.lastPlatformId !== platform.config.id) {
+                                            if (platform.config.type === 'JUMP_PAD') { playerVelocity.y = platform.config.bounceForce; }
+                                            else { handlePlatformLanded(platform); }
+                                        }
+                                        gameState.lastPlatformId = platform.config.id;
+                                    } else { // Hit ceiling
+                                        player.position.y -= penetration.y;
+                                        if (playerVelocity.y > 0) playerVelocity.y = 0;
+                                    }
+                                } else if (penetration.x < penetration.z) { // Horizontal X collision
+                                    player.position.x += (playerCenter.x > platformCenter.x ? penetration.x : -penetration.x);
+                                    playerVelocity.x = 0;
+                                } else { // Horizontal Z collision
+                                    player.position.z += (playerCenter.z > platformCenter.z ? penetration.z : -penetration.z);
+                                    playerVelocity.z = 0;
+                                }
+                                
+                                player.updateWorldMatrix(true, false);
+                                playerPhysicsBox.setFromObject(playerPhysicsBody);
+                            }
+                        }
+                        
+                        if (groundCollisionThisStep && gameState.lastPlatformId !== -1) {
+                            const lastPlat = movingPlatforms.find(p => p.config.id === gameState.lastPlatformId);
+                            if(lastPlat) {
+                                const platVelFrame = lastPlat.mesh.position.clone().sub(lastPlat.lastPos).divideScalar(delta).multiplyScalar(stepDelta);
+                                player.position.add(platVelFrame);
+                            }
+                        }
+                    }
+
+                    if (!onGround) { gameState.lastPlatformId = -1; }
+                    
+                    cameraYaw.position.copy(player.position);
+                    camera.position.lerp(cameraOffset, 0.1);
+                    
+                    let newState = 'idle';
+                    if (!onGround) newState = 'jump'; else if (moveDirection.lengthSq() > 0.01) newState = 'walk';
+                    if (newState !== gameState.playerState) {
+                        gameState.playerState = newState;
+                        if(config.player.appearanceType === 'ANIMATED_SPRITE') {
+                            const newTex = player.userData.textures[newState] || player.userData.textures.walk || player.userData.textures.idle;
+                            if(newTex) playerVisual.material.map = newTex;
+                        }
+                    }
+                    if(config.player.appearanceType === 'COLOR' || config.player.appearanceType === 'TEXTURED_BLOCKY') {
+                        const parts = playerVisual.userData.parts;
+                        const anim = config.player.animation;
+                        let currentSwing = 0; if (newState === 'walk') { currentSwing = Math.sin(elapsedTime * anim.walkSpeed) * anim.swingAngle; }
+                        const lerpSpeed = delta * 10;
+                        parts.armL.rotation.x += (currentSwing - parts.armL.rotation.x) * lerpSpeed;
+                        parts.armR.rotation.x += (-currentSwing - parts.armR.rotation.x) * lerpSpeed;
+                        parts.legL.rotation.x += (-currentSwing - parts.legL.rotation.x) * lerpSpeed;
+                        parts.legR.rotation.x += (currentSwing - parts.legR.rotation.x) * lerpSpeed;
+                        playerVisual.rotation.y += (cameraYaw.rotation.y - playerVisual.rotation.y) * lerpSpeed;
                     }
                 }
+                function checkInteractions() {
+                     player.updateWorldMatrix(true, false); playerPhysicsBox.setFromObject(playerPhysicsBody);
+                     for (let i = collectibles.length - 1; i >= 0; i--) { if(collectibles[i] && playerPhysicsBox.intersectsBox(collectibleBoxes[i])) { gameState.score += collectibles[i].userData.value; document.getElementById('score').innerText = 'Score: ' + gameState.score; scene.remove(collectibles[i]); collectibles.splice(i, 1); collectibleBoxes.splice(i, 1); } }
+                     for (const cp of checkpoints) {
+                        if (!cp.activated && playerPhysicsBox.intersectsBox(cp.box)) {
+                            cp.activated = true;
+                            currentRespawnPoint.copy(cp.mesh.position).add(new THREE.Vector3(0, 1, 0));
+                            cp.mesh.material.color = ACTIVE_CHECKPOINT_COLOR;
+                            cp.mesh.material.emissive = ACTIVE_CHECKPOINT_COLOR;
+                        }
+                     }
+                     const allHazards = [...enemyBoxes, ...hazardBoxes]; for (const box of allHazards) { if (playerPhysicsBox.intersectsBox(box)) { loseLife(); return; } } if (player.position.y < -50) { loseLife(); }
+                }
+                function updateSceneObjects(delta, elapsedTime) {
+                    enemies.forEach((enemy, i) => { const data = enemy.userData; enemy.position.x += 1.5 * data.direction * delta; if (enemy.position.x > data.originX + data.patrolRange || enemy.position.x < data.originX - data.patrolRange) { data.direction *= -1; } enemyBoxes[i].setFromObject(enemy); });
+                    collectibles.forEach(c => { c.rotation.y += 1 * delta; });
+                    mediaObjects.forEach(m => { if (m.isSprite) m.lookAt(camera.position); });
+                    movingPlatforms.forEach(p => {
+                        p.lastPos.copy(p.mesh.position);
+                        const range = p.config.patrolRange;
+                        const speed = p.config.speed / 5;
+                        p.mesh.position[p.config.axis] = p.config.pos[p.config.axis] + Math.sin(elapsedTime * speed) * range;
+                    });
+                    phasingPlatforms.forEach(p => {
+                        const cycle = p.config.onTime + p.config.offTime;
+                        const timeInCycle = (elapsedTime + p.config.phase) % cycle;
+                        p.mesh.visible = timeInCycle < p.config.onTime;
+                    });
+                }
+                function loseLife() { gameState.lives--; document.getElementById('lives').innerText = 'Lives: ' + gameState.lives; if (gameState.lives <= 0) { gameState.gameOver = true; showMessage('Execution Halted', 'Final Score: ' + gameState.score); } else { player.position.copy(currentRespawnPoint); playerVelocity.set(0,0,0); } }
+                function checkWinCondition() { if (!gameState.gameWon && gameState.score >= config.rules.winScore) { gameState.gameWon = true; showMessage('Execution Complete', 'Final Score: ' + gameState.score); } }
+                function showMessage(title, text, showButton = true) { if(document.pointerLockElement) document.exitPointerLock(); document.getElementById('message-title').innerText = title; document.getElementById('message-text').innerText = text; document.getElementById('message-box').querySelector('button').style.display = showButton ? 'inline-block' : 'none'; document.getElementById('message-box').style.display = 'block'; }
+                function animate() { if (gameState.gameOver || gameState.gameWon) return; requestAnimationFrame(animate); const delta = Math.min(clock.getDelta(), 0.1); const elapsedTime = clock.getElapsedTime(); updateSceneObjects(delta, elapsedTime); updatePlayer(delta, elapsedTime); checkInteractions(); checkWinCondition(); composer.render(); cssRenderer.render(scene, camera); }
                 
-                if (groundCollisionThisStep && gameState.lastPlatformId !== -1) {
-                    const lastPlat = movingPlatforms.find(p => p.config.id === gameState.lastPlatformId);
-                    if(lastPlat) {
-                        const platVelFrame = lastPlat.mesh.position.clone().sub(lastPlat.lastPos).divideScalar(delta).multiplyScalar(stepDelta);
-                        player.position.add(platVelFrame);
+                init();
+            }
+        
+                (async () => {
+                    let config;
+                    try {
+                        const response = await fetch('world.json');
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        config = await response.json();
+                    } catch (error) {
+                        console.error('Failed to load world config:', error);
+                        document.getElementById('start-prompt').innerHTML = '<h1>❌ Error</h1><p>Could not load world.json. This folder must be run from a web server.</p>';
+                        return;
                     }
-                }
-            }
-
-            if (!onGround) { gameState.lastPlatformId = -1; }
-            
-            cameraYaw.position.copy(player.position);
-            camera.position.lerp(cameraOffset, 0.1);
-            
-            let newState = 'idle';
-            if (!onGround) newState = 'jump'; else if (moveDirection.lengthSq() > 0.01) newState = 'walk';
-            if (newState !== gameState.playerState) {
-                gameState.playerState = newState;
-                if(config.player.appearanceType === 'ANIMATED_SPRITE') {
-                    const newTex = player.userData.textures[newState] || player.userData.textures.walk || player.userData.textures.idle;
-                    if(newTex) playerVisual.material.map = newTex;
-                }
-            }
-            if(config.player.appearanceType === 'COLOR' || config.player.appearanceType === 'TEXTURED_BLOCKY') {
-                const parts = playerVisual.userData.parts;
-                const anim = config.player.animation;
-                let currentSwing = 0; if (newState === 'walk') { currentSwing = Math.sin(elapsedTime * anim.walkSpeed) * anim.swingAngle; }
-                const lerpSpeed = delta * 10;
-                parts.armL.rotation.x += (currentSwing - parts.armL.rotation.x) * lerpSpeed;
-                parts.armR.rotation.x += (-currentSwing - parts.armR.rotation.x) * lerpSpeed;
-                parts.legL.rotation.x += (-currentSwing - parts.legL.rotation.x) * lerpSpeed;
-                parts.legR.rotation.x += (currentSwing - parts.legR.rotation.x) * lerpSpeed;
-                playerVisual.rotation.y += (cameraYaw.rotation.y - playerVisual.rotation.y) * lerpSpeed;
-            }
-        }
-
-        function checkInteractions(elapsedTime) {
-             player.updateWorldMatrix(true, false); playerPhysicsBox.setFromObject(playerPhysicsBody);
-             for (let i = collectibles.length - 1; i >= 0; i--) { if(collectibles[i] && playerPhysicsBox.intersectsBox(collectibleBoxes[i])) { gameState.score += collectibles[i].userData.value; document.getElementById('score').innerText = 'Score: ' + gameState.score; scene.remove(collectibles[i]); collectibles.splice(i, 1); collectibleBoxes.splice(i, 1); } }
-             for (const cp of checkpoints) {
-                if (!cp.activated && playerPhysicsBox.intersectsBox(cp.box)) {
-                    cp.activated = true;
-                    currentRespawnPoint.copy(cp.mesh.position).add(new THREE.Vector3(0, 1, 0));
-                    cp.mesh.material.color = ACTIVE_CHECKPOINT_COLOR;
-                    cp.mesh.material.emissive = ACTIVE_CHECKPOINT_COLOR;
-                }
-             }
-             const allHazards = [...enemyBoxes, ...hazardBoxes]; for (const box of allHazards) { if (playerPhysicsBox.intersectsBox(box)) { loseLife(); return; } } if (player.position.y < -50) { loseLife(); }
-        }
-        function updateSceneObjects(delta, elapsedTime) {
-            enemies.forEach((enemy, i) => { const data = enemy.userData; enemy.position.x += 1.5 * data.direction * delta; if (enemy.position.x > data.originX + data.patrolRange || enemy.position.x < data.originX - data.patrolRange) { data.direction *= -1; } enemyBoxes[i].setFromObject(enemy); });
-            collectibles.forEach(c => { c.rotation.y += 1 * delta; });
-            mediaObjects.forEach(m => { if (m.isSprite) m.lookAt(camera.position); });
-            movingPlatforms.forEach(p => {
-                p.lastPos.copy(p.mesh.position);
-                const range = p.config.patrolRange;
-                const speed = p.config.speed / 5;
-                p.mesh.position[p.config.axis] = p.config.pos[p.config.axis] + Math.sin(elapsedTime * speed) * range;
-            });
-            phasingPlatforms.forEach(p => {
-                const cycle = p.config.onTime + p.config.offTime;
-                const timeInCycle = (elapsedTime + p.config.phase) % cycle;
-                p.mesh.visible = timeInCycle < p.config.onTime;
-            });
-        }
-        function loseLife() { gameState.lives--; document.getElementById('lives').innerText = 'Lives: ' + gameState.lives; if (gameState.lives <= 0) { gameState.gameOver = true; showMessage('Execution Halted', 'Final Score: ' + gameState.score); } else { player.position.copy(currentRespawnPoint); playerVelocity.set(0,0,0); } }
-        function checkWinCondition() { if (!gameState.gameWon && gameState.score >= config.rules.winScore) { gameState.gameWon = true; showMessage('Execution Complete', 'Final Score: ' + gameState.score); } }
-        function showMessage(title, text, showButton = true) { if(document.pointerLockElement) document.exitPointerLock(); document.getElementById('message-title').innerText = title; document.getElementById('message-text').innerText = text; document.getElementById('message-box').querySelector('button').style.display = showButton ? 'inline-block' : 'none'; document.getElementById('message-box').style.display = 'block'; }
-        function animate() { if (gameState.gameOver || gameState.gameWon) return; requestAnimationFrame(animate); const delta = Math.min(clock.getDelta(), 0.1); const elapsedTime = clock.getElapsedTime(); updateSceneObjects(delta, elapsedTime); updatePlayer(delta, elapsedTime); checkInteractions(elapsedTime); checkWinCondition(); composer.render(); cssRenderer.render(scene, camera); }
-        init();
+                    runGame(config);
+                })();
+                
     </script>
 </body>
 </html>
